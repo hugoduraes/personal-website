@@ -1,0 +1,138 @@
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+@import (less) '../../bower_components/normalize-css/normalize.css';
+@import (less) '../../bower_components/components-font-awesome/less/font-awesome.less';
+@import (less) url('http://fonts.googleapis.com/css?family=Lato:300,700');
+
+// font awesome path
+@fa-font-path: '/fonts';
+
+html {
+    font-size: 16px;
+}
+
+body {
+    background-color: darken(#FFF, 10%);
+    font-family: 'Lato', sans-serif;
+    font-size: 62.5%;
+    font-weight: 300;
+}
+
+header {
+    margin: 5px 0 5px 0;
+    padding: 0;
+
+    div {
+        margin: 0 auto;
+        width: 50px;
+    }
+
+    img {
+        border-radius: 25px;
+    }
+}
+
+.cover {
+    background: #1F5893 url('/images/bg320.jpg') no-repeat center top;
+    background-size: cover;
+    color: #FFF;
+    overflow: hidden;
+
+    div {
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    h1 {
+        font-size: 3.8em;
+        font-weight: 300;
+        margin: 0;
+    }
+
+    strong {
+        font-weight: 700;
+    }
+
+    p {
+        font-size: 2.8em;
+        margin: 70px 0 0 0;
+    }
+
+    a {
+        color: #FFF;
+        font-weight: 700;
+        text-decoration: underline;
+
+        &:hover {
+            text-decoration: none;
+        }
+    }
+
+    ul {
+        list-style: none;
+        margin: 30px 0 0 0;
+        padding: 0;
+    }
+
+    li {
+        display: inline;
+        font-size: 1.8em;
+        margin-left: 20px;
+
+        &:first-child {
+            margin-left: 0;
+        }
+    }
+
+    i {
+        color: #FFF;
+    }
+
+    .fa-twitter:hover {
+        color: #55ACEE;
+    }
+
+    .fa-linkedin:hover {
+        color: #1884BB;
+    }
+
+    .fa-github:hover {
+        color: #4183c4;
+    }
+
+    .fa-envelope:hover {
+        color: #D64A38;
+    }
+}
+
+footer {
+    color: lighten(#000, 50%);
+    font-size: 1.8em;
+    margin-top: 10px;
+
+    div {
+        margin: 0 auto;
+        padding: 0 20px;
+        line-height: 1.5em;
+    }
+
+    a {
+        color: lighten(#000, 50%);
+        font-weight: 700;
+        text-decoration: underline;
+
+        &:hover {
+            text-decoration: none;
+        }
+    }
+
+    p {
+        margin-top: 0;
+    }
+}
+
+@import (less) './responsive.less';
