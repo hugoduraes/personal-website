@@ -149,21 +149,6 @@ gulp.task('dist', function (callback) {
     );
 });
 
-// Deploy task
-gulp.task('deploy', ['dist'], function () {
-    var secrets = require('./secretfile.json');
-
-    return gulp.src('public')
-        .pipe(plugins.rsync({
-            root : 'public',
-            hostname : secrets.deploy.username + '@' + secrets.deploy.hostname,
-            port : secrets.deploy.port,
-            destination : secrets.deploy.path,
-            clean: true,
-            recursive: true
-        }));
-});
-
 // Default task
 gulp.task('default', ['build'], function () {
     // browser sync
