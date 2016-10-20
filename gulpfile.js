@@ -54,8 +54,8 @@ gulp.task('less', function () {
 // JavaScript task
 gulp.task('js', function() {
     return gulp.src([
-            'bower_components/html5shiv/dist/html5shiv.min.js',
-            'bower_components/picturefill/dist/picturefill.min.js'
+            'node_modules/html5shiv/dist/html5shiv.min.js',
+            'node_modules/picturefill/dist/picturefill.min.js'
         ])
         .pipe(gulp.dest('public/scripts'))
         .pipe(browserSync.reload({stream: true}));
@@ -75,7 +75,7 @@ gulp.task('images', function() {
 
 // Fonts task
 gulp.task('fonts', function() {
-    return gulp.src(['bower_components/components-font-awesome/fonts/*'])
+    return gulp.src(['node_modules/font-awesome/fonts/*'])
         .pipe(gulp.dest('public/fonts'))
         .pipe(browserSync.reload({stream: true}));
 });
