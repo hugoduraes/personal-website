@@ -1,6 +1,26 @@
 language: node_js
 node_js:
-  - "6.9"
-before_script:
-  - npm install -g gulp
-script: gulp dist
+  - '6.9'
+branches:
+  only:
+  - master
+addons:
+  ssh_known_hosts: hugoduraes.com:32573
+script: "./node_modules/.bin/gulp dist"
+before_deploy:
+  - openssl aes-256-cbc -K $encrypted_1312388825a2_key -iv $encrypted_1312388825a2_iv -in .travis/travis_rsa.enc -out /tmp/travis_rsa -d
+  - rm .travis/travis_rsa.enc
+  - eval "$(ssh-agent -s)"
+  - chmod 600 /tmp/travis_rsa
+  - ssh-add /tmp/travis_rsa
+  - rm -f /tmp/travis_rsa
+deploy:
+  skip_cleanup: true
+  provider: script
+  script: rsync -r --delete-after --quiet -e "ssh -p 32573" $TRAVIS_BUILD_DIR/public/* travis@hugoduraes.com:/var/www/hugoduraes.com/public/
+  on:
+    branch: master
+notifications:
+  email: false
+  slack:
+    secure: FW8FoHhlhFPlRyiQ5Izs6mzqcmE1Dp3XPOjyfdZftPFX4C0uTRbTKl5/3f44TMAACBTTRAvpkRIkTJk1H4UmWDRo1G4ZpwHflxKaN7jiPRxn+n6Cp8mKjvyGgV2mdmEXMH99CnELrqicMHoyXKnPbEuAaWXbbz69qKFfWTPgFS6TFcXwzGO9o55zbzpd5jz9qu91TvAn807D3w/yz/uot5UYubYSZpZiwHS9C9hGL0iNbwni3CuYFTW6EHHmvDUyQrtxUsktkXJPetlD2n7T+1UESQZYL6AX73lQf5oY7623h3u2GskKSNJxmp5KrqY4CQP+CppjpHQAFq8815CgIACta8nZBKzJH8n66k4zUhXslE5A1fbgTj9mOe+SiUa7WtARC7HjhrTgbCY6M+bydbLwF563HEETFVUoVYW/C/4wTopB8MdeVMkT3wlAusZD25clPBbpEI31Afc9LOUnPFkoQ3RoNAR0UvwWZ45Jcu27xb0Wqscajn0V8bUyrK/ukTZZBMhZxfgo0aimIJkduacB4z5oGfWXEt4SbahiRwBcrjmfbTNzYRopltkEGz289coRlGQdvApwS4xekiigu85F+0p4k3Vr+lNjtvcQuGypPXkKTVZs6CNa+uLRqZefLXQk8cd23YtiHIrQU1K3n+BShWQ8dxf+SPWncIkFetI=
