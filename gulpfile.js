@@ -45,7 +45,7 @@ gulp.task('less', function () {
         .on('error', handleError)
         .pipe(plugins.autoprefixer())
         .pipe(plugins.size({title: 'CSS'}))
-        .pipe(plugins.minifyCss())
+        .pipe(plugins.cleanCss())
         .pipe(plugins.size({title: 'CSS Minified'}))
         .pipe(gulp.dest('public/styles'))
         .pipe(browserSync.reload({stream: true}));
@@ -84,7 +84,7 @@ gulp.task('fonts', function() {
 gulp.task('html', function() {
     return gulp.src('public/index.html')
         .pipe(plugins.size({title: 'HTML'}))
-        .pipe(plugins.minifyHtml())
+        .pipe(plugins.htmlmin({ collapseWhitespace: true }))
         .pipe(plugins.size({title: 'HTML Minified'}))
         .pipe(gulp.dest('public'))
         .pipe(browserSync.reload({stream: true}));
@@ -92,13 +92,13 @@ gulp.task('html', function() {
 
 // Cache bust task
 gulp.task('cachebust', function() {
-    var userefAssets = plugins.useref.assets();
+    var indexFilter = plugins.filter(['**/*', '!**/index.html'], { restore: true });
 
     return gulp.src('public/index.html')
-        .pipe(userefAssets)
-        .pipe(plugins.rev()) // calculate assets revision hash
-        .pipe(userefAssets.restore())
         .pipe(plugins.useref())
+        .pipe(indexFilter)
+        .pipe(plugins.rev()) // calculate assets revision hash
+        .pipe(indexFilter.restore)
         .pipe(plugins.revReplace()) // replace references to assets with revision hash
         .pipe(gulp.dest('public'))
         .pipe(plugins.revNapkin()); // delete original files
@@ -121,7 +121,9 @@ gulp.task('gzip', function() {
 
 // Build clean task
 gulp.task('build-clean', function (callback) {
-    del(['public'], {}, callback);
+    del(['public']).then(paths => {
+      callback();
+    });
 });
 
 // Build task
@@ -139,7 +141,6 @@ gulp.task('build', function (callback) {
 
 // Dist task
 gulp.task('dist', function (callback) {
-    // TODO: build distribution to temporary folder and delete it after deployment
     runSequence(
         'build',
         'cachebust',
