@@ -1,18 +1,40 @@
 'use strict';
 
-var gulp = require('gulp');
-var path = require('path');
-var browserSync = require('browser-sync');
-var runSequence = require('run-sequence');
-var del = require('del');
-var plugins = require('gulp-load-plugins')();
+const gulp = require('gulp');
+const path = require('path');
+const browserSync = require('browser-sync');
+const del = require('del');
+const plugins = require('gulp-load-plugins')();
+const log = require('fancy-log');
+
+/**
+ * Tasks
+ */
+
+gulp.task('build', gulp.series(
+  buildClean,
+  less,
+  js,
+  images,
+  fonts,
+  copy
+));
+
+gulp.task('dist', gulp.series(
+  'build',
+  cachebust,
+  gzip,
+  html
+));
+
+gulp.task('default', gulp.series('build', watch));
 
 /**
  * Utils
  */
 
-var handleError = function () {
-  var args = Array.prototype.slice.call(arguments);
+function handleError () {
+  const args = Array.prototype.slice.call(arguments);
 
   // send error to notification center with gulp-notify
   plugins.notify.onError({
@@ -20,19 +42,13 @@ var handleError = function () {
     message: '<%= error.message %>'
   }).apply(this, args);
 
-  // console log
-  plugins.util.log(args);
+  log(args);
 
   // keep gulp from hanging on this task
   this.emit('end');
-};
+}
 
-/**
- * Tasks
- */
-
-// Less task
-gulp.task('less', function () {
+function less () {
   browserSync.notify('Compiling LESS files...');
 
   return gulp.src(['app/styles/styles.less'])
@@ -44,20 +60,18 @@ gulp.task('less', function () {
     .pipe(plugins.size({title: 'CSS Minified'}))
     .pipe(gulp.dest('public/styles'))
     .pipe(browserSync.reload({stream: true}));
-});
+}
 
-// JavaScript task
-gulp.task('js', function() {
+function js () {
   return gulp.src([
     'node_modules/html5shiv/dist/html5shiv.min.js',
     'node_modules/picturefill/dist/picturefill.min.js'
   ])
   .pipe(gulp.dest('public/scripts'))
   .pipe(browserSync.reload({stream: true}));
-});
+}
 
-// Images task
-gulp.task('images', function() {
+function images () {
   return gulp.src('app/images/**/*')
     .pipe(plugins.imagemin({
       optimizationLevel: 3,
@@ -66,28 +80,25 @@ gulp.task('images', function() {
     }))
     .pipe(gulp.dest('public/images'))
     .pipe(browserSync.reload({stream: true}));
-});
+}
 
-// Fonts task
-gulp.task('fonts', function() {
+function fonts () {
   return gulp.src(['node_modules/font-awesome/fonts/*'])
     .pipe(gulp.dest('public/fonts'))
     .pipe(browserSync.reload({stream: true}));
-});
+}
 
-// HTML task
-gulp.task('html', function() {
+function html () {
   return gulp.src('public/index.html')
     .pipe(plugins.size({title: 'HTML'}))
     .pipe(plugins.htmlmin({ collapseWhitespace: true }))
     .pipe(plugins.size({title: 'HTML Minified'}))
     .pipe(gulp.dest('public'))
     .pipe(browserSync.reload({stream: true}));
-});
+}
 
-// Cache bust task
-gulp.task('cachebust', function() {
-  var indexFilter = plugins.filter(['**/*', '!**/index.html'], { restore: true });
+function cachebust () {
+  const indexFilter = plugins.filter(['**/*', '!**/index.html'], { restore: true });
 
   return gulp.src('public/index.html')
     .pipe(plugins.useref())
@@ -97,63 +108,33 @@ gulp.task('cachebust', function() {
     .pipe(plugins.revReplace()) // replace references to assets with revision hash
     .pipe(gulp.dest('public'))
     .pipe(plugins.revNapkin()); // delete original files
-});
+}
 
-// Copy task
-gulp.task('copy', function() {
+function copy () {
   return gulp.src(['app/*.{html,ico,txt}'])
     .pipe(gulp.dest('public'))
     .pipe(browserSync.reload({stream: true}));
-});
+}
 
-// Gzip task
-gulp.task('gzip', function() {
+function gzip () {
   return gulp.src(['public/styles/*.css'])
     .pipe(plugins.gzip())
     .pipe(plugins.size({title: 'CSS Gzip'}))
     .pipe(gulp.dest('public/styles'));
-});
+}
 
-// Build clean task
-gulp.task('build-clean', function (callback) {
-  del(['public']).then(paths => {
-    callback();
-  });
-});
+function buildClean (callback) {
+  del(['public']).then((paths) => { callback(); });
+}
 
-// Build task
-gulp.task('build', function (callback) {
-  runSequence(
-    'build-clean',
-    'less',
-    'js',
-    'images',
-    'fonts',
-    'copy',
-    callback
-  );
-});
-
-// Dist task
-gulp.task('dist', function (callback) {
-  runSequence(
-    'build',
-    'cachebust',
-    'gzip',
-    'html',
-    callback
-  );
-});
-
-// Default task
-gulp.task('default', ['build'], function () {
+function watch () {
   // browser sync
   browserSync.init({
     server: {
       baseDir: 'public',
       middleware: [
         function (req, res, next) {
-          var ext = path.extname(req.url);
+          const ext = path.extname(req.url);
           if ((ext === '' || ext === '.html') && req.url !== '/') {
             req.pipe(request('http://' + req.headers.host)).pipe(res);
           } else {
@@ -167,7 +148,7 @@ gulp.task('default', ['build'], function () {
   });
 
   // watch files
-  gulp.watch('app/styles/**/*.less', ['less']);
-  gulp.watch('app/images/**/*', ['images']);
-  gulp.watch('app/*.{html,ico,txt}', ['copy']);
-});
+  gulp.watch('app/styles/**/*.less', less);
+  gulp.watch('app/images/**/*', images);
+  gulp.watch('app/*.{html,ico,txt}', copy);
+}
