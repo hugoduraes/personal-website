@@ -58,7 +58,7 @@ function less () {
     .pipe(plugins.size({title: 'CSS'}))
     .pipe(plugins.cleanCss())
     .pipe(plugins.size({title: 'CSS Minified'}))
-    .pipe(gulp.dest('public/styles'))
+    .pipe(gulp.dest('dist/styles'))
     .pipe(browserSync.reload({stream: true}));
 }
 
@@ -67,7 +67,7 @@ function js () {
     'node_modules/html5shiv/dist/html5shiv.min.js',
     'node_modules/picturefill/dist/picturefill.min.js'
   ])
-  .pipe(gulp.dest('public/scripts'))
+  .pipe(gulp.dest('dist/scripts'))
   .pipe(browserSync.reload({stream: true}));
 }
 
@@ -78,60 +78,60 @@ function images () {
       progressive : true,
       interlaced : true
     }))
-    .pipe(gulp.dest('public/images'))
+    .pipe(gulp.dest('dist/images'))
     .pipe(browserSync.reload({stream: true}));
 }
 
 function fonts () {
   return gulp.src(['node_modules/font-awesome/fonts/*'])
-    .pipe(gulp.dest('public/fonts'))
+    .pipe(gulp.dest('dist/fonts'))
     .pipe(browserSync.reload({stream: true}));
 }
 
 function html () {
-  return gulp.src('public/index.html')
+  return gulp.src('dist/index.html')
     .pipe(plugins.size({title: 'HTML'}))
     .pipe(plugins.htmlmin({ collapseWhitespace: true }))
     .pipe(plugins.size({title: 'HTML Minified'}))
-    .pipe(gulp.dest('public'))
+    .pipe(gulp.dest('dist'))
     .pipe(browserSync.reload({stream: true}));
 }
 
 function cachebust () {
   const indexFilter = plugins.filter(['**/*', '!**/index.html'], { restore: true });
 
-  return gulp.src('public/index.html')
+  return gulp.src('dist/index.html')
     .pipe(plugins.useref())
     .pipe(indexFilter)
     .pipe(plugins.rev()) // calculate assets revision hash
     .pipe(indexFilter.restore)
     .pipe(plugins.revReplace()) // replace references to assets with revision hash
-    .pipe(gulp.dest('public'))
+    .pipe(gulp.dest('dist'))
     .pipe(plugins.revNapkin()); // delete original files
 }
 
 function copy () {
-  return gulp.src(['src/*.{html,ico,txt}'])
-    .pipe(gulp.dest('public'))
+  return gulp.src(['src/*.{html,ico,txt}', 'src/CNAME'])
+    .pipe(gulp.dest('dist'))
     .pipe(browserSync.reload({stream: true}));
 }
 
 function gzip () {
-  return gulp.src(['public/styles/*.css'])
+  return gulp.src(['dist/styles/*.css'])
     .pipe(plugins.gzip())
     .pipe(plugins.size({title: 'CSS Gzip'}))
-    .pipe(gulp.dest('public/styles'));
+    .pipe(gulp.dest('dist/styles'));
 }
 
 function buildClean (callback) {
-  del(['public']).then((paths) => { callback(); });
+  del(['dist']).then((paths) => { callback(); });
 }
 
 function watch () {
   // browser sync
   browserSync.init({
     server: {
-      baseDir: 'public',
+      baseDir: 'dist',
       middleware: [
         function (req, res, next) {
           const ext = path.extname(req.url);
