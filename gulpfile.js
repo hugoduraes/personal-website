@@ -51,7 +51,7 @@ function handleError () {
 function less () {
   browserSync.notify('Compiling LESS files...');
 
-  return gulp.src(['app/styles/styles.less'])
+  return gulp.src(['src/styles/styles.less'])
     .pipe(plugins.less())
     .on('error', handleError)
     .pipe(plugins.autoprefixer())
@@ -72,7 +72,7 @@ function js () {
 }
 
 function images () {
-  return gulp.src('app/images/**/*')
+  return gulp.src('src/images/**/*')
     .pipe(plugins.imagemin({
       optimizationLevel: 3,
       progressive : true,
@@ -111,7 +111,7 @@ function cachebust () {
 }
 
 function copy () {
-  return gulp.src(['app/*.{html,ico,txt}'])
+  return gulp.src(['src/*.{html,ico,txt}'])
     .pipe(gulp.dest('public'))
     .pipe(browserSync.reload({stream: true}));
 }
@@ -148,7 +148,7 @@ function watch () {
   });
 
   // watch files
-  gulp.watch('app/styles/**/*.less', less);
-  gulp.watch('app/images/**/*', images);
-  gulp.watch('app/*.{html,ico,txt}', copy);
+  gulp.watch('src/styles/**/*.less', less);
+  gulp.watch('src/images/**/*', images);
+  gulp.watch('src/*.{html,ico,txt}', copy);
 }
