@@ -1,3 +1,3 @@
 # Personal Website
 
-Repository for my personal website at [http://hugoduraes.com](http://hugoduraes.com).
+Repository for my personal website at [https://hugoduraes.com](hugoduraes.com).
