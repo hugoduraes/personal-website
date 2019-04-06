@@ -1,25 +1,19 @@
 language: node_js
 branches:
   only:
-  - master
-addons:
-  ssh_known_hosts: 178.79.159.178
-script: ./node_modules/.bin/gulp dist
-before_deploy:
-  - openssl aes-256-cbc -K $encrypted_b29e5146ef90_key -iv $encrypted_b29e5146ef90_iv -in .travis/deploy-key.enc -out /tmp/deploy-key -d
-  - rm .travis/deploy-key.enc
-  - eval "$(ssh-agent -s)"
-  - chmod 600 /tmp/deploy-key
-  - ssh-add /tmp/deploy-key
-  - rm -f /tmp/deploy-key
+  - source
+script: "./node_modules/.bin/gulp dist"
 deploy:
+  provider: pages
   skip_cleanup: true
-  provider: script
-  # https://linux.die.net/man/1/rsync
-  script: rsync -qazr --no-perms --force --delete $TRAVIS_BUILD_DIR/public/* deploy@178.79.159.178:/var/www/hugoduraes.com/public/
+  github_token: "$GITHUB_TOKEN"
   on:
     branch: master
 notifications:
   email: false
   slack:
-    secure: FW8FoHhlhFPlRyiQ5Izs6mzqcmE1Dp3XPOjyfdZftPFX4C0uTRbTKl5/3f44TMAACBTTRAvpkRIkTJk1H4UmWDRo1G4ZpwHflxKaN7jiPRxn+n6Cp8mKjvyGgV2mdmEXMH99CnELrqicMHoyXKnPbEuAaWXbbz69qKFfWTPgFS6TFcXwzGO9o55zbzpd5jz9qu91TvAn807D3w/yz/uot5UYubYSZpZiwHS9C9hGL0iNbwni3CuYFTW6EHHmvDUyQrtxUsktkXJPetlD2n7T+1UESQZYL6AX73lQf5oY7623h3u2GskKSNJxmp5KrqY4CQP+CppjpHQAFq8815CgIACta8nZBKzJH8n66k4zUhXslE5A1fbgTj9mOe+SiUa7WtARC7HjhrTgbCY6M+bydbLwF563HEETFVUoVYW/C/4wTopB8MdeVMkT3wlAusZD25clPBbpEI31Afc9LOUnPFkoQ3RoNAR0UvwWZ45Jcu27xb0Wqscajn0V8bUyrK/ukTZZBMhZxfgo0aimIJkduacB4z5oGfWXEt4SbahiRwBcrjmfbTNzYRopltkEGz289coRlGQdvApwS4xekiigu85F+0p4k3Vr+lNjtvcQuGypPXkKTVZs6CNa+uLRqZefLXQk8cd23YtiHIrQU1K3n+BShWQ8dxf+SPWncIkFetI=
+    rooms:
+    - secure: qSB9t15fls1LkKNICZ8e0OWziJRp5P7J1ENQn2XYKfx3rbAjPCuxduPZ3tg7p2lQrHf49gofsGkcoOC+/E5cqoDbFaUJqSV/kcfne7cZjMFUBS51TD84XPT/KCfGLgXtdBJXc1aLCv2m6Nd/l6jvsuonPxOhPyU0fZwrXW2WJAKV1oXwXOFgxkSAVlZ1oKwrcVgSCpmF1WYqfGKH9G3uJTcoPT+A/w9zS9ru7Tey376cx0s6uHS7552vshc7gmnH6fQ2ICPYuTCMwjOB6a7AibYK0DHFmvZ4zHEFR02wEUi+jpd9GoTMl9bySIPP6483MuSebEErtiytIVfqQGxONWYVIEt2CqoHk7700Y3TG1FvanHofPUg1fLTPGsxEhhEKEtWfRApABQieMWkgJkFtOaLql4xKgjbGOO0Lr4ow6lDuQaLgn2HlJsVPKMfkKUB0A2rg48QqjWDL8sR4+25bc8xtJV4ae88fMikeG/SPmO07/VOWTuC0U0Qmfm+Gj2wo4zb3D0CA0fi5w3BvTMrkmL+SPXG2bnPAC6mtxzGlu2c0CIxABjHHMpq4GY3c5QL/we38GWLSVrGiqOEvuDwR3nQbuscn24PVBrh8Qvy+pu9sud2AjBCGbclLeddhXahKSGgUFHy4HCp0hT/KOujzbyOEbVljsXD2S/grKldLoM=
+env:
+  matrix:
+    secure: RxX/1AgPK5NnFsZNTtXDgU95JJMVEcSmHp1v7V2dfVfB0RPBvyeYR4cYJWdcyzLZP4JSQENkWYKn+DQ/xMxry/I7HXglYeS6dbO1Zm/gKJHjU3q3hJDndMjj7c7dVz9tzWJ/bh4qCgFihv5sjdjOao14JuRUFKTbii+HQ4odsayAxsr6v9X7Z2qu/m6KWBATDL8FC6+ZKSg9DQVwXjNBnMhGx70GiaLsUyf8k9My1bp8MySoZ4S6vNmBIB+HNa5DCMsE9lzqV+BjWMYVr075LesOuTTXxLnc9kYKCf5J8WXLqWxrcOZcnOGVnPnzfCjm1ZHxgWmKy487TiMyGe4i6XaHFI2Tu2fzd88qW1aMBD+ob5sCACKSD176vss+x/65jA6iQDtXz4Obw8haMWfoAFULZ0r8JCy3P1Nt+8zYO0Xj87CU9QWWhv2aXapy1c23NoGO+AWg6Xwmgw5PkbQofydc2qgYIgBDZifdMWmGdw1ia2zBpO7+TawceIy3izgKtZf6FBfxIpT4BsFT308SXfHAH1fHnImdnp8dKsd8qV7KQIyAuQ9TuFD/OeCTL3R65KpGcd8ItmLDZ+R/iYJiTuPi0BgzEmh9hMphdWwI9vh9OJ9bCTYBG7OenBobat1wg7hjYZLOY5bdhSSbuWumORokh7GbEarL+4eLPDgE1G4=
