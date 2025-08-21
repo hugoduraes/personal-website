@@ -1,11 +1,39 @@
 'use strict';
 
-const gulp = require('gulp');
-const path = require('path');
+const autoprefixer = require('gulp-autoprefixer');
 const browserSync = require('browser-sync');
+const cleanCss = require('gulp-clean-css');
 const del = require('del');
-const plugins = require('gulp-load-plugins')();
+const filter = require('gulp-filter');
+const gulp = require('gulp');
+const gzip = require('gulp-gzip');
+const htmlmin = require('gulp-htmlmin');
+const imagemin = require('gulp-imagemin');
+const less = require('gulp-less');
 const log = require('fancy-log');
+const notify = require("gulp-notify");
+const path = require('path');
+const rev = require('gulp-rev');
+const revNapkin = require('gulp-rev-napkin');
+const revReplace = require('gulp-rev-replace');
+const size = require('gulp-size');
+const useref = require('gulp-useref');
+
+const plugins = {
+  autoprefixer,
+  cleanCss,
+  filter,
+  gzip,
+  htmlmin,
+  imagemin,
+  less,
+  notify,
+  rev,
+  revNapkin,
+  revReplace,
+  size,
+  useref,
+};
 
 /**
  * Tasks
@@ -13,8 +41,8 @@ const log = require('fancy-log');
 
 gulp.task('build', gulp.series(
   buildClean,
-  less,
-  js,
+  styles,
+  scripts,
   images,
   fonts,
   copy
@@ -23,7 +51,7 @@ gulp.task('build', gulp.series(
 gulp.task('dist', gulp.series(
   'build',
   cachebust,
-  gzip,
+  compressStyles,
   html
 ));
 
@@ -48,7 +76,7 @@ function handleError () {
   this.emit('end');
 }
 
-function less () {
+function styles () {
   browserSync.notify('Compiling LESS files...');
 
   return gulp.src(['src/styles/styles.less'])
@@ -62,7 +90,7 @@ function less () {
     .pipe(browserSync.reload({stream: true}));
 }
 
-function js () {
+function scripts () {
   return gulp.src([
     'node_modules/html5shiv/dist/html5shiv.min.js',
     'node_modules/picturefill/dist/picturefill.min.js'
@@ -72,7 +100,7 @@ function js () {
 }
 
 function images () {
-  return gulp.src('src/images/**/*')
+  return gulp.src('src/images/**/*', { encoding: false })
     .pipe(plugins.imagemin({
       optimizationLevel: 3,
       progressive : true,
@@ -83,7 +111,7 @@ function images () {
 }
 
 function fonts () {
-  return gulp.src(['node_modules/font-awesome/fonts/*'])
+  return gulp.src('node_modules/font-awesome/fonts/*', { encoding: false })
     .pipe(gulp.dest('dist/fonts'))
     .pipe(browserSync.reload({stream: true}));
 }
@@ -116,7 +144,7 @@ function copy () {
     .pipe(browserSync.reload({stream: true}));
 }
 
-function gzip () {
+function compressStyles () {
   return gulp.src(['dist/styles/*.css'])
     .pipe(plugins.gzip())
     .pipe(plugins.size({title: 'CSS Gzip'}))
@@ -148,7 +176,7 @@ function watch () {
   });
 
   // watch files
-  gulp.watch('src/styles/**/*.less', less);
+  gulp.watch('src/styles/**/*.less', styles);
   gulp.watch('src/images/**/*', images);
   gulp.watch('src/*.{html,ico,txt}', copy);
 }
