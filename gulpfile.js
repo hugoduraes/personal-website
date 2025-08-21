@@ -111,7 +111,7 @@ function cachebust () {
 }
 
 function copy () {
-  return gulp.src(['src/*.{html,ico,txt}', 'src/CNAME'])
+  return gulp.src(['src/*.{html,ico,txt}'])
     .pipe(gulp.dest('dist'))
     .pipe(browserSync.reload({stream: true}));
 }
