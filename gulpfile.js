@@ -13,6 +13,7 @@ const less = require('gulp-less');
 const log = require('fancy-log');
 const notify = require("gulp-notify");
 const path = require('path');
+const request = require('request');
 const rev = require('gulp-rev');
 const revNapkin = require('gulp-rev-napkin');
 const revReplace = require('gulp-rev-replace');
