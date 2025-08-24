@@ -1,0 +1,41 @@
+version: 2
+
+updates:
+  - package-ecosystem: github-actions
+    directory: '/'
+    schedule:
+      interval: monthly
+      timezone: 'Europe/Lisbon'
+      day: monday
+      time: '09:00'
+    rebase-strategy: auto
+    commit-message:
+      prefix: chore
+      prefix-development: chore
+      include: scope
+
+  - package-ecosystem: npm
+    directory: '/'
+    schedule:
+      interval: monthly
+      timezone: 'Europe/Lisbon'
+      day: monday
+      time: '09:00'
+    rebase-strategy: auto
+    commit-message:
+      prefix: chore
+      prefix-development: chore
+      include: scope
+    groups:
+      dev-dependencies:
+        dependency-type: development
+        update-types:
+          - patch
+          - minor
+          - major
+      dependencies:
+        dependency-type: production
+        update-types:
+          - patch
+          - minor
+          - major
